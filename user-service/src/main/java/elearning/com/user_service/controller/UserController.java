@@ -63,7 +63,6 @@ public class UserController {
 
     // ✅ إضافة مدرب (يتطلب صلاحية أدمن)
     @PostMapping("/add-trainer")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addTrainer(
             @RequestBody @Valid TrainerRegistrationDto trainerDto,
             @RequestHeader("Authorization") String authHeader) {
