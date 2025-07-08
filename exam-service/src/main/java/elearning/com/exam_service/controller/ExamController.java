@@ -21,6 +21,7 @@ public class ExamController {
     // ✅ إنشاء اختبار جديد لكورس (من قبل المدرب)
     @PostMapping("/create")
     public Exam createExam(@RequestBody Exam exam) {
+        System.out.println("Rcieved Request From Course-Service To Create Exam");
         return examRepository.save(exam);
     }
 

@@ -33,4 +33,11 @@ public class EnrollmentController {
     public List<Enrollment> getCourseEnrollments(@PathVariable String courseId) {
         return enrollmentRepository.findByCourseId(courseId);
     }
+
+    // ✅ التحقق من حالة الدفع لمستخدم
+    @GetMapping("/check")
+    public boolean checkEnrollment(@RequestParam String studentId, @RequestParam String courseId) {
+        return enrollmentRepository.existsByStudentIdAndCourseId(studentId, courseId);
+    }
+
 }

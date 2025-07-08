@@ -7,4 +7,6 @@ import java.util.List;
 public interface EnrollmentRepository extends MongoRepository<Enrollment, String> {
     List<Enrollment> findByStudentId(String studentId);
     List<Enrollment> findByCourseId(String courseId);
+    boolean existsByStudentIdAndCourseId(String studentId, String courseId);
+
 }

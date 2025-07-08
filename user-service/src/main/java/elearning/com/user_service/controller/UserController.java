@@ -13,11 +13,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;  
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +35,8 @@ public class UserController {
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
+    private final RestTemplate restTemplate;
+
 
     // ✅ تسجيل مستخدم جديد (متعلم)
     @PostMapping("/register")
@@ -124,6 +132,45 @@ public class UserController {
         userRepository.deleteById(id);
         return ResponseEntity.ok(new SuccessResponse("User deleted"));
     }
+
+    // ✅ التحقق من حالة دفع مستخدم
+    @GetMapping("/{userId}/courses/{courseId}/enrollment-status")
+    public ResponseEntity<?> checkUserEnrollment(
+        @PathVariable String userId,
+        @PathVariable String courseId,
+        HttpServletRequest request) {
+
+        try {
+            // نسخ Authorization Header من الطلب الأصلي
+            HttpHeaders headers = new HttpHeaders();
+            String token = request.getHeader("Authorization");
+            headers.set("Authorization", token);
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            // إرسال الطلب مع الهيدر
+            ResponseEntity<Boolean> response = restTemplate.exchange(
+                "http://enrollment-service/api/enrollments/check?studentId=" + userId + "&courseId=" + courseId,
+                HttpMethod.GET,
+                entity,
+                Boolean.class
+            );
+
+            Boolean isEnrolled = response.getBody();
+            return ResponseEntity.ok(new EnrollmentStatusResponse(isEnrolled));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorResponse("Failed to contact enrollment service"));
+        }
+    }
+
+    // كلاس داخلي للاستجابة
+    @Data
+    @AllArgsConstructor
+    static class EnrollmentStatusResponse {
+        private Boolean enrolled;
+    }
+
 
     // ✅ كلاس داخلي لطلب تسجيل الدخول
     @Data
