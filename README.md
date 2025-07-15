@@ -100,7 +100,7 @@ e-learning-system/
 
 ## 👨‍💻 Authors
 
-* Salma Abu Shaqir
+* Salma Abou Shkair
 
 **Supervisor:** Eng. Aya Al-Moati
 
